@@ -1,25 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import axios from './axios'; // Import the Axios instance
 
-function App() {
+function MovieApp() {
+  const [movies, setMovies] = useState([]);
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    // Fetch popular movies
+    const fetchMovies = async () => {
+      const response = await axios.get(`/movie/popular?api_key=50be6e09cf08397cf3a4d661105735ad`);
+      setMovies(response.data.results);
+    };
+
+    fetchMovies();
+  }, []);
+
+  const handleSearch = async () => {
+    const response = await axios.get(`/search/movie?api_key=50be6e09cf08397cf3a4d661105735ad&query=${search}`);
+    setMovies(response.data.results);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <input
+        type="text"
+        placeholder="Search movies..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      <button onClick={handleSearch}>Search</button>
+      <div>
+        {movies.map((movie) => (
+          <div key={movie.id}>
+            <h3>{movie.title}</h3>
+            <p>{movie.overview}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
-export default App;
+export default MovieApp;
